@@ -1,0 +1,4 @@
+name: TorosamyCore
+version: '1.0-SNAPSHOT'
+main: net.torosamy.torosamyCore.TorosamyCore
+api-version: '1.21'
