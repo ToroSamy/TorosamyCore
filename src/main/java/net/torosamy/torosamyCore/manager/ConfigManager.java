@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
@@ -16,16 +17,33 @@ public class ConfigManager {
     private YamlConfiguration yamlConfiguration;
     private TorosamyConfig torosamyConfig;
     private Map<String, String> configValues;
+    private String path;
+    private String dataPath;
+    private String fileName;
     public ConfigManager(TorosamyConfig torosamyConfig) {
         this.torosamyConfig = torosamyConfig;
         this.configValues = getConfigValues(torosamyConfig.getClass());
     }
 
-    public void init(Plugin plugin, String fileName) throws IllegalAccessException {
+    /**
+     * 加载配置文件
+     * @param plugin 对应的插件
+     * @param fileName 配置文件xx.yml
+     * @throws IllegalAccessException
+     */
+    public void load(Plugin plugin, String fileName) throws IllegalAccessException {
         loadFile(plugin, fileName);
         initConfig();
     }
-    public void init(Plugin plugin, String dataPath, String fileName) throws IllegalAccessException {
+
+    /**
+     * 加载配置文件
+     * @param plugin 对应的插件
+     * @param dataPath 相对路径 xx/xx
+     * @param fileName 配置文件xx.yml
+     * @throws IllegalAccessException
+     */
+    public void load(Plugin plugin, String dataPath, String fileName) throws IllegalAccessException {
         loadFile(plugin, dataPath, fileName);
         initConfig();
     }
@@ -40,21 +58,25 @@ public class ConfigManager {
      */
     public void loadFile(Plugin plugin, String dataPath, String fileName) {
         //拼接插件的路径结构
-        String path = plugin.getDataFolder().getPath() + "/" +dataPath;
+        this.path = plugin.getDataFolder().getPath() + "/" +dataPath;
         //文件对象
-        File file = new File(path, fileName);
+        File file = new File(this.path, fileName);
         //不存在则保存默认
         if (!file.exists()) {plugin.saveResource(dataPath + "/" + fileName, false);}
         this.yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+        this.dataPath = dataPath;
+        this.fileName = fileName;
     }
     public void loadFile(Plugin plugin, String fileName) {
         //拼接插件的路径结构
-        String path = plugin.getDataFolder().getPath();
+        this.path = plugin.getDataFolder().getPath();
         //文件对象
-        File file = new File(path, fileName);
+        File file = new File(this.path, fileName);
         //不存在则保存默认
         if (!file.exists()) {plugin.saveResource(fileName, false);}
         this.yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+        this.dataPath = "";
+        this.fileName = fileName;
     }
 
     public void initConfig() throws IllegalAccessException {
@@ -76,7 +98,7 @@ public class ConfigManager {
                     if (fieldName.equals(section)) {
                         try {initConfigValue(field, this.torosamyConfig, type, section);}
                         catch (IllegalAccessException e) {throw new RuntimeException(e);}
-                        configValues.remove(section);
+                        //configValues.remove(section);
                         break;
                     }
                 }
@@ -100,13 +122,57 @@ public class ConfigManager {
                     if (fieldName.equals(section)) {
                         try {initConfigValue(field, config, type, section);}
                         catch (IllegalAccessException e) {throw new RuntimeException(e);}
-                        configValues.remove(section);
+                        //configValues.remove(section);
                         break;
                     }
                 }
             }
         }
     }
+
+    public void saveFile() throws IllegalAccessException, IOException {
+        for(Field field : this.torosamyConfig.getClass().getDeclaredFields()) {
+            //获取字段名
+            String fieldName = MessageUtil.fieldToKey(field.getName());
+            //获取数据类型
+            String fieldClazz = getTypeString(field.getType());
+            if("Object".equals(fieldClazz)) {
+                saveFile((TorosamyConfig) field.get(this.torosamyConfig),fieldName+".");
+            }
+            else {
+                for (Map.Entry<String, String> entry : configValues.entrySet()) {
+                    String section = entry.getKey();
+                    if (fieldName.equals(section)) {
+                        this.yamlConfiguration.set(section,field.get(this.torosamyConfig));
+                        break;
+                    }
+                }
+            }
+        }
+        this.yamlConfiguration.save(new File(this.path, this.fileName));
+    }
+
+    public void saveFile(TorosamyConfig config, String prefix) throws IllegalAccessException {
+        for (Field field : config.getClass().getDeclaredFields()) {
+            //获取字段名
+            String fieldName = prefix + MessageUtil.fieldToKey(field.getName());
+            //获取数据类型
+            String fieldClazz = getTypeString(field.getType());
+            if("Object".equals(fieldClazz)) {
+                saveFile((TorosamyConfig) field.get(config),fieldName+".");
+            }
+            else {
+                for (Map.Entry<String, String> entry : configValues.entrySet()) {
+                    String section = entry.getKey();
+                    if (fieldName.equals(section)) {
+                        this.yamlConfiguration.set(section,field.get(config));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * 使用 配置文件中对应的值 给 config对象的某个field赋值
@@ -134,7 +200,6 @@ public class ConfigManager {
         } else if (type.equals("List$Integer")) {
             field.set(config, this.yamlConfiguration.getIntegerList(section));
         }
-        System.out.println("设置成功");
     }
     public static Map<String, String> getConfigValues(Class<?> clazz) {
         return getConfigValues(clazz, "");
