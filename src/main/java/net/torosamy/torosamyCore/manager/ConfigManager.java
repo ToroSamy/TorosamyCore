@@ -2,13 +2,17 @@ package net.torosamy.torosamyCore.manager;
 
 import net.torosamy.torosamyCore.config.TorosamyConfig;
 import net.torosamy.torosamyCore.utils.MessageUtil;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.units.qual.A;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,10 +100,20 @@ public class ConfigManager {
                     String section = entry.getKey();
                     String type = entry.getValue();
                     if (fieldName.equals(section)) {
-                        try {initConfigValue(field, this.torosamyConfig, type, section);}
-                        catch (IllegalAccessException e) {throw new RuntimeException(e);}
-                        //configValues.remove(section);
-                        break;
+                        if("List$ListString".equals(type)) {
+                            ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
+                            List<List<String>> list = new ArrayList<>();
+                            for (String messageLineSection : sonConfig.getKeys(false)) {
+                                list.add(sonConfig.getStringList(messageLineSection));
+                            }
+                            field.set(this.torosamyConfig, list);
+                        }
+                        else {
+                            try {initConfigValue(field, this.torosamyConfig, type, section);}
+                            catch (IllegalAccessException e) {throw new RuntimeException(e);}
+                            //configValues.remove(section);
+                            break;
+                        }
                     }
                 }
             }
@@ -120,10 +134,20 @@ public class ConfigManager {
                     String section = entry.getKey();
                     String type = entry.getValue();
                     if (fieldName.equals(section)) {
-                        try {initConfigValue(field, config, type, section);}
-                        catch (IllegalAccessException e) {throw new RuntimeException(e);}
-                        //configValues.remove(section);
-                        break;
+                        if("List$ListString".equals(type)) {
+                            ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
+                            List<List<String>> list = new ArrayList<>();
+                            for (String messageLineSection : sonConfig.getKeys(false)) {
+                                list.add(sonConfig.getStringList(messageLineSection));
+                            }
+                            field.set(config, list);
+                        }
+                        else {
+                            try {initConfigValue(field, config, type, section);}
+                            catch (IllegalAccessException e) {throw new RuntimeException(e);}
+                            //configValues.remove(section);
+                            break;
+                        }
                     }
                 }
             }
@@ -224,10 +248,16 @@ public class ConfigManager {
             Class<?> type = field.getType();
             String fieldName = prefix + MessageUtil.fieldToKey(field.getName());
             String fieldType = getTypeString(type);
-            //如果是List 则获取泛型
+            //如果是List 处理其泛型
             if ("List".equals(fieldType)) {
-                Class<?> listGenericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-                map.put(fieldName, "List$" + getTypeString(listGenericType));
+                //获取List的泛型
+                Type listGenericType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+                String listGenericTypeString = getListGenericTypeString(listGenericType);
+                if ("List$ListString".equals(listGenericTypeString)) {
+                    map.put(fieldName, "List$ListString");
+                }
+                else map.put(fieldName, "List$" + listGenericTypeString);
+
             }
             // 基本类型或包装类型直接加入map
             else if (!"Object".equals(fieldType)) {
@@ -239,6 +269,27 @@ public class ConfigManager {
             }
         }
         return map;
+    }
+
+    private static String getListGenericTypeString(Type type) {
+        // 检查类型是否为ParameterizedType
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type rawType = parameterizedType.getRawType();
+            // 如果泛型类型是List，则递归调用
+            if (rawType instanceof Class<?> && "List".equals(((Class<?>) rawType).getSimpleName())) {
+                return "List$ListString";
+            } else {
+                // 如果不是List，则返回对应的类型字符串
+                return getTypeString((Class<?>) rawType);
+            }
+        } else if (type instanceof Class<?>) {
+            // 如果类型是Class，直接返回类型字符串
+            return getTypeString((Class<?>) type);
+        } else {
+            // 其他情况，返回未知类型
+            return "Unknown";
+        }
     }
 
     public static String getTypeString(Class<?> clazz) {
