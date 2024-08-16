@@ -12,10 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ConfigManager {
     private YamlConfiguration yamlConfiguration;
@@ -166,9 +163,19 @@ public class ConfigManager {
             else {
                 for (Map.Entry<String, String> entry : configValues.entrySet()) {
                     String section = entry.getKey();
+                    String type = entry.getValue();
                     if (fieldName.equals(section)) {
-                        this.yamlConfiguration.set(section,field.get(this.torosamyConfig));
-                        break;
+                        if("List$ListString".equals(type)) {
+                            ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
+                            for (String key : sonConfig.getKeys(false)) {
+                                this.yamlConfiguration.set(section+"."+key, sonConfig.getStringList(key));
+                            }
+                        }
+                        else {
+                            this.yamlConfiguration.set(section,field.get(this.torosamyConfig));
+                            break;
+                        }
+
                     }
                 }
             }
@@ -188,9 +195,19 @@ public class ConfigManager {
             else {
                 for (Map.Entry<String, String> entry : configValues.entrySet()) {
                     String section = entry.getKey();
+                    String type = entry.getValue();
                     if (fieldName.equals(section)) {
-                        this.yamlConfiguration.set(section,field.get(config));
-                        break;
+                        if("List$ListString".equals(type)) {
+                            ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
+                            for (String key : sonConfig.getKeys(false)) {
+                                this.yamlConfiguration.set(section+"."+key, sonConfig.getStringList(key));
+                            }
+                        }
+                        else {
+                            this.yamlConfiguration.set(section,field.get(config));
+                            break;
+                        }
+
                     }
                 }
             }
