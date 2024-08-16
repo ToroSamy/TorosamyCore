@@ -167,8 +167,22 @@ public class ConfigManager {
                     if (fieldName.equals(section)) {
                         if("List$ListString".equals(type)) {
                             ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
+
+//                            for (String key : sonConfig.getKeys(false)) {
+//                                String str = section + "."+key;
+//                                System.out.println(str);
+//                                Object o = field.get(this.torosamyConfig);
+//                                System.out.println(o);
+//
+//                                this.yamlConfiguration.set(section+"."+key, sonConfig.getStringList(key));
+//
+//                            }
+
+                            int index = 0;
+                            List<List<String>> strList = (List<List<String>>) field.get(this.torosamyConfig);
                             for (String key : sonConfig.getKeys(false)) {
-                                this.yamlConfiguration.set(section+"."+key, sonConfig.getStringList(key));
+                                this.yamlConfiguration.set(section+"."+key, strList.get(index));
+                                index++;
                             }
                         }
                         else {
@@ -199,9 +213,14 @@ public class ConfigManager {
                     if (fieldName.equals(section)) {
                         if("List$ListString".equals(type)) {
                             ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
+
+                            int index = 0;
+                            List<List<String>> strList = (List<List<String>>) field.get(config);
                             for (String key : sonConfig.getKeys(false)) {
-                                this.yamlConfiguration.set(section+"."+key, sonConfig.getStringList(key));
+                                this.yamlConfiguration.set(section+"."+key, strList.get(index));
+                                index++;
                             }
+
                         }
                         else {
                             this.yamlConfiguration.set(section,field.get(config));
