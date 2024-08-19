@@ -9,9 +9,6 @@ import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Set;
 
 public class CommandManager {
     public LegacyPaperCommandManager<CommandSender> manager;
@@ -21,17 +18,6 @@ public class CommandManager {
 
     public void registerExceptionHandlers() {
         this.manager.exceptionController().registerHandler(InvalidSyntaxException.class, context -> {
-//            String[] split = context.exception().correctSyntax().split(" ");
-//            for (int i = 1; i < split.length; i++) {
-//                if(split[i].contains("|")) {
-//                    split[i] = split[i].replaceAll("\\|", " | ");
-//                    split[i] = "(" + split[i] + ")";
-//                }
-//            }
-//            StringBuilder builder = new StringBuilder();
-//            builder.append(split[0]);
-//            for (int i = 1; i < split.length; i++) builder.append(" ").append(split[i]);
-//            String correctCommand = builder.toString();
             String correctCommand = context.exception().correctSyntax().replaceAll("\\|", "*");
             context.context().sender().sendMessage(MessageUtil.text("&b[服务器娘]&c指令语法错误 正确语法: &e/" + correctCommand));
         });

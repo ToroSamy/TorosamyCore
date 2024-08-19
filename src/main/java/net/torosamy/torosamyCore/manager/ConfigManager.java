@@ -5,7 +5,7 @@ import net.torosamy.torosamyCore.utils.MessageUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.units.qual.A;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class ConfigManager {
         this.torosamyConfig = torosamyConfig;
         this.configValues = getConfigValues(torosamyConfig.getClass());
     }
-
+    public YamlConfiguration getYamlConfiguration() {return yamlConfiguration;}
     /**
      * 加载配置文件
      * @param plugin 对应的插件
@@ -68,6 +68,28 @@ public class ConfigManager {
         this.dataPath = dataPath;
         this.fileName = fileName;
     }
+
+    public void loadTemplateFile(Plugin plugin, String dataPath, String fileName, ConfigurationSection configSection) throws IOException {
+        //拼接插件的路径结构
+        this.path = plugin.getDataFolder().getPath() + "/" +dataPath;
+        this.dataPath = dataPath;
+        this.fileName = fileName;
+        //文件对象
+        File file = new File(this.path, this.fileName);
+        if (!file.exists()) {
+            YamlConfiguration yamlConfig = new YamlConfiguration();
+            Set<String> keys = configSection.getKeys(true);
+            System.out.println(configSection);
+            if(keys.isEmpty()) System.out.println("keys为空");
+            keys.forEach(key -> {
+                System.out.println(key);
+                yamlConfig.set(key,configSection.get(key));
+            });
+            yamlConfig.save(new File(this.path,this.fileName));
+        }
+        this.yamlConfiguration = YamlConfiguration.loadConfiguration(file);
+    }
+
     public void loadFile(Plugin plugin, String fileName) {
         //拼接插件的路径结构
         this.path = plugin.getDataFolder().getPath();
@@ -168,15 +190,6 @@ public class ConfigManager {
                         if("List$ListString".equals(type)) {
                             ConfigurationSection sonConfig = this.yamlConfiguration.getConfigurationSection(section);
 
-//                            for (String key : sonConfig.getKeys(false)) {
-//                                String str = section + "."+key;
-//                                System.out.println(str);
-//                                Object o = field.get(this.torosamyConfig);
-//                                System.out.println(o);
-//
-//                                this.yamlConfiguration.set(section+"."+key, sonConfig.getStringList(key));
-//
-//                            }
 
                             int index = 0;
                             List<List<String>> strList = (List<List<String>>) field.get(this.torosamyConfig);
