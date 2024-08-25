@@ -25,6 +25,7 @@ public class ConfigManager {
         this.torosamyConfig = torosamyConfig;
         this.configValues = getConfigValues(torosamyConfig.getClass());
     }
+    public ConfigManager() {}
     public YamlConfiguration getYamlConfiguration() {return yamlConfiguration;}
     /**
      * 加载配置文件
@@ -79,10 +80,7 @@ public class ConfigManager {
         if (!file.exists()) {
             YamlConfiguration yamlConfig = new YamlConfiguration();
             Set<String> keys = configSection.getKeys(true);
-            System.out.println(configSection);
-            if(keys.isEmpty()) System.out.println("keys为空");
             keys.forEach(key -> {
-                System.out.println(key);
                 yamlConfig.set(key,configSection.get(key));
             });
             yamlConfig.save(new File(this.path,this.fileName));

@@ -1,4 +1,6 @@
 name: TorosamyCore
 version: '1.0-SNAPSHOT'
+authors: [ Torosamy,yweiyang ]
+website: https://www.torosamy.net
 main: net.torosamy.torosamyCore.TorosamyCore
-api-version: '1.21'
+api-version: '1.13'
