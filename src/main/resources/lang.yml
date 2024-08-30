@@ -1,0 +1,7 @@
+correct-command: "&b[服务器娘]&c指令语法错误 正确语法: &e/{command}"
+lack-permission: "&b[服务器娘]&c缺少权限 (&e{permission}&c) 来使用指令"
+command-sender-error: "&b[服务器娘]&c您必须是一名 &e{type} &c才能这么做"
+player-type: "玩家"
+admin-type: "管理员"
+unknown-type: "未知类型"
+reload-message: "&b[服务器娘]&a插件 &eTorosamyCore &a重载成功喵~"

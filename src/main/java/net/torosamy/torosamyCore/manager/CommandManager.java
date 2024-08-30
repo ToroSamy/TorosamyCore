@@ -1,6 +1,7 @@
 package net.torosamy.torosamyCore.manager;
 
 
+import net.torosamy.torosamyCore.utils.ConfigUtil;
 import net.torosamy.torosamyCore.utils.MessageUtil;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.annotations.AnnotationParser;
@@ -19,20 +20,20 @@ public class CommandManager {
     public void registerExceptionHandlers() {
         this.manager.exceptionController().registerHandler(InvalidSyntaxException.class, context -> {
             String correctCommand = context.exception().correctSyntax().replaceAll("\\|", "*");
-            context.context().sender().sendMessage(MessageUtil.text("&b[服务器娘]&c指令语法错误 正确语法: &e/" + correctCommand));
+            context.context().sender().sendMessage(MessageUtil.text(ConfigUtil.langConfig.correctCommand).replace("{command}", correctCommand));
         });
 
         this.manager.exceptionController().registerHandler(NoPermissionException.class, context -> {
-            context.context().sender().sendMessage(MessageUtil.text("&b[服务器娘]&c缺少权限 (&e" + context.exception().missingPermission().permissionString() + "&c) 来使用指令"));
+            context.context().sender().sendMessage(MessageUtil.text(ConfigUtil.langConfig.lackPermission.replace("{permission}",context.exception().missingPermission().permissionString())));
         });
 
         this.manager.exceptionController().registerHandler(InvalidCommandSenderException.class, context -> {
             String[] split = context.exception().requiredSenderTypes().toString().split("\\.");
             String typeString = split[split.length - 1];
-            if(typeString.equals("Player]")) typeString = "玩家";
-            else if(typeString.equals("ConsoleCommandSender]")) typeString="管理员";
-            else typeString = "未知类型";
-            context.context().sender().sendMessage(MessageUtil.text("&b[服务器娘]&c您必须是一名&e " + typeString + " &c才能这么做"));
+            if(typeString.equals("Player]")) typeString = ConfigUtil.langConfig.playerType;
+            else if(typeString.equals("ConsoleCommandSender]")) typeString=ConfigUtil.langConfig.adminType;
+            else typeString = ConfigUtil.langConfig.unknownType;
+            context.context().sender().sendMessage(MessageUtil.text(ConfigUtil.langConfig.commandSenderError.replace("{type}", typeString)));
         });
     }
 }

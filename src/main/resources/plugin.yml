@@ -1,5 +1,5 @@
 name: TorosamyCore
-version: '1.0-SNAPSHOT'
+version: '2.0-SNAPSHOT'
 authors: [ Torosamy,yweiyang ]
 website: https://www.torosamy.net
 main: net.torosamy.torosamyCore.TorosamyCore
