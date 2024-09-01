@@ -10,8 +10,6 @@ public class ConfigUtil {
 
     public static void reloadConfig() {
         langConfigManager.load();
-
-        System.out.println(langConfig);
     }
 
     public static void saveConfig() {

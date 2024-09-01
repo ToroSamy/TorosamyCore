@@ -5,6 +5,6 @@ import net.torosamy.torosamyCore.commands.AdminCommands;
 
 public class CommandUtil {
     public static void registerCommand() {
-        TorosamyCore.plugin.getCommandManager().annotationParser.parse(new AdminCommands());
+        TorosamyCore.commanderManager.annotationParser.parse(new AdminCommands());
     }
 }

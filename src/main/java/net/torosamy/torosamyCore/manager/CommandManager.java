@@ -8,14 +8,19 @@ import org.incendo.cloud.annotations.AnnotationParser;
 import org.incendo.cloud.exception.InvalidCommandSenderException;
 import org.incendo.cloud.exception.InvalidSyntaxException;
 import org.incendo.cloud.exception.NoPermissionException;
+import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
-
+import org.bukkit.plugin.Plugin;
 
 public class CommandManager {
     public LegacyPaperCommandManager<CommandSender> manager;
     public AnnotationParser<CommandSender> annotationParser;
 
-    public CommandManager() {}
+    public CommandManager(Plugin plugin) {
+        this.manager = LegacyPaperCommandManager.createNative(plugin, ExecutionCoordinator.simpleCoordinator());
+        this.annotationParser = new AnnotationParser(this.manager, CommandManager.class);
+        registerExceptionHandlers();
+    }
 
     public void registerExceptionHandlers() {
         this.manager.exceptionController().registerHandler(InvalidSyntaxException.class, context -> {

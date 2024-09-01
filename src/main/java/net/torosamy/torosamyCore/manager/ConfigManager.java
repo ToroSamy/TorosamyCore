@@ -1,6 +1,6 @@
 package net.torosamy.torosamyCore.manager;
 
-import net.torosamy.torosamyCore.config.LangConfig;
+
 import net.torosamy.torosamyCore.config.TorosamyConfig;
 
 import net.torosamy.torosamyCore.utils.MessageUtil;
