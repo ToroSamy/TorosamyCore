@@ -104,6 +104,25 @@ public class ConfigManager {
         }
         return YamlConfiguration.loadConfiguration(file);
     }
+    public static YamlConfiguration loadYaml(Plugin plugin, String dataPath, String fileName, TorosamyConfig config) {
+        String path = plugin.getDataFolder().getPath() + File.separator + dataPath;
+        File file = new File(path, fileName);
+        if (!file.exists()) {
+            YamlConfiguration yamlConfig = new YamlConfiguration();
+
+            saveYaml(config,yamlConfig,"");
+
+            try {
+                yamlConfig.save(new File(path, fileName));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+        }
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
 
     public static void loadData(TorosamyConfig config, YamlConfiguration yamlConfiguration, String prefix) {
         if (!prefix.isEmpty()) prefix += ".";
@@ -136,24 +155,24 @@ public class ConfigManager {
         // 遍历类的所有字段
         for (Field declaredField : config.getClass().getDeclaredFields()) {
             try {
-                String fieldName = MessageUtil.keyTofield(declaredField.getName());
+                String fieldName = MessageUtil.fieldToKey(declaredField.getName());
                 // 检查字段是否为TorosamyConfig的子类或实例
                 if (TorosamyConfig.class.isAssignableFrom(declaredField.getType())) {
                     saveYaml((TorosamyConfig) declaredField.get(config), yamlConfiguration, prefix + fieldName);
                     continue;
                 }
-                Object o = yamlConfiguration.get(prefix + fieldName);
-
+                String item = prefix + fieldName;
+                Object o = declaredField.get(config);
                 if (o instanceof MemorySection section) {
                     int index = 0;
                     List<List<Object>> list = (List<List<Object>>) declaredField.get(config);
 
                     for (String key : section.getKeys(false)) {
-                        yamlConfiguration.set(prefix + fieldName + "." + key, list.get(index));
+                        yamlConfiguration.set(item + "." + key, list.get(index));
                         index++;
                     }
 
-                } else yamlConfiguration.set(prefix + fieldName, o);
+                } else yamlConfiguration.set(item, o);
 
             } catch (IllegalAccessException ignored) {
             }
