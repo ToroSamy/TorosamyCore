@@ -48,9 +48,12 @@ public class ConfigManager {
     }
 
     public void save() {
+        String path = dataPath.isEmpty() ?
+                plugin.getDataFolder().getPath():
+                plugin.getDataFolder().getPath() + File.separator + dataPath;
         if(section == null) yaml = loadYaml(plugin, dataPath, fileName);
         else yaml = loadYaml(plugin,dataPath, fileName, section);
-        saveYaml(config, yaml, "");
+        saveYaml(config, yaml, "",path, fileName);
     }
 
     public TorosamyConfig getConfig() {
@@ -70,11 +73,12 @@ public class ConfigManager {
 //    }
     public static HashMap<String, ConfigurationSection> loadYamls(Plugin plugin, String directoryName, String prefixPath) {
         HashMap<String, ConfigurationSection> yamls = new HashMap<>();
-        File directory = new File(plugin.getDataFolder(), directoryName);
+        String fileName = prefixPath.isEmpty() ? directoryName : prefixPath + File.separator + directoryName;
+        File directory = new File(plugin.getDataFolder(), fileName);
         if (!directory.exists()) directory.mkdirs();
         for (File file : directory.listFiles()) {
             String filePath = prefixPath.isEmpty() ? file.getName() : prefixPath + File.separator + file.getName();
-            if (file.isDirectory()) yamls.putAll(loadYamls(plugin, file.getName(), filePath));
+            if (file.isDirectory()) yamls.putAll(loadYamls(plugin, file.getName(), directoryName));
             else if (file.getName().endsWith(".yml")) yamls.put(filePath, YamlConfiguration.loadConfiguration(file));
         }
         return yamls;
@@ -104,21 +108,12 @@ public class ConfigManager {
         }
         return YamlConfiguration.loadConfiguration(file);
     }
+
     public static YamlConfiguration loadYaml(Plugin plugin, String dataPath, String fileName, TorosamyConfig config) {
         String path = plugin.getDataFolder().getPath() + File.separator + dataPath;
         File file = new File(path, fileName);
         if (!file.exists()) {
-            YamlConfiguration yamlConfig = new YamlConfiguration();
-
-            saveYaml(config,yamlConfig,"");
-
-            try {
-                yamlConfig.save(new File(path, fileName));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-
+            saveYaml(config, new YamlConfiguration(), "",path, fileName);
         }
         return YamlConfiguration.loadConfiguration(file);
     }
@@ -150,7 +145,7 @@ public class ConfigManager {
         }
     }
 
-    public static void saveYaml(TorosamyConfig config, YamlConfiguration yamlConfiguration, String prefix) {
+    public static void saveYaml(TorosamyConfig config, YamlConfiguration yamlConfiguration, String prefix,String path,String fileName) {
         if (!prefix.isEmpty()) prefix += ".";
         // 遍历类的所有字段
         for (Field declaredField : config.getClass().getDeclaredFields()) {
@@ -158,7 +153,7 @@ public class ConfigManager {
                 String fieldName = MessageUtil.fieldToKey(declaredField.getName());
                 // 检查字段是否为TorosamyConfig的子类或实例
                 if (TorosamyConfig.class.isAssignableFrom(declaredField.getType())) {
-                    saveYaml((TorosamyConfig) declaredField.get(config), yamlConfiguration, prefix + fieldName);
+                    saveYaml((TorosamyConfig) declaredField.get(config), yamlConfiguration, prefix + fieldName,path, fileName);
                     continue;
                 }
                 String item = prefix + fieldName;
@@ -174,8 +169,10 @@ public class ConfigManager {
 
                 } else yamlConfiguration.set(item, o);
 
-            } catch (IllegalAccessException ignored) {
-            }
+            } catch (IllegalAccessException ignored) {}
         }
+
+        try {yamlConfiguration.save(new File(path, fileName));}
+        catch (IOException e) {throw new RuntimeException(e);}
     }
 }
