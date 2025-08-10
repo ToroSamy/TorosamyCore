@@ -21,6 +21,7 @@ class TorosamyCore : JavaPlugin() {
         ConfigUtil.reloadConfig()
         Bukkit.getConsoleSender().sendMessage(MessageUtil.text("&a[服务器娘]&a插件 &eTorosamyCore &a成功开启喵~"))
         Bukkit.getConsoleSender().sendMessage(MessageUtil.text("&a[服务器娘]&a作者 &eTorosamy|yweiyang"))
+        Bukkit.getConsoleSender().sendMessage(MessageUtil.text("&a[服务器娘]&aNBT &ev1_21_R1"))
     }
 
     override fun onDisable() {
