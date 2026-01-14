@@ -1,13 +1,13 @@
 package net.torosamy.torosamyCore.utils;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.CustomData;
+import org.bukkit.craftbukkit.v1_21_R5.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.world.item.component.CustomData;
-import org.bukkit.craftbukkit.v1_21_R1.inventory.CraftItemStack;
-import org.bukkit.inventory.ItemStack;
 
 public class NbtUtil {
 
@@ -25,8 +25,6 @@ public class NbtUtil {
 
 
     public static void setString(ItemStack itemStack, final String keyword, final String value) {
-        net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack); // 转换为 NMS 物品
-
         NBTTagCompound compound = getOrCreateCustomDataCompound(itemStack);
 
         compound.a(keyword, NBTTagString.a(value));
@@ -52,9 +50,9 @@ public class NbtUtil {
         }
         NBTTagCompound compound = data.d();
 
-        NBTBase base = compound.c(keyword);
+        NBTBase base = compound.a(keyword);
         if (base instanceof NBTTagString) {
-            return ((NBTTagString) base).s_();
+            return ((NBTTagString) base).k();
         }
         return null;
     }
@@ -68,9 +66,9 @@ public class NbtUtil {
         }
         NBTTagCompound compound = data.d();
 
-        NBTBase base = compound.c(keyword);
+        NBTBase base = compound.a(keyword);
         if (base instanceof NBTTagInt) {
-            return ((NBTTagInt) base).g();
+            return ((NBTTagInt) base).h();
         }
         return 0;
     }

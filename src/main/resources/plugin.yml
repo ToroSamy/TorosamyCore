@@ -1,6 +1,8 @@
 name: TorosamyCore
-version: '2.0-SNAPSHOT'
+version: '3.0-SNAPSHOT'
 authors: [ Torosamy,yweiyang ]
-website: https://www.torosamy.net
+website: https://www.bitlie.net
 main: net.torosamy.torosamyCore.TorosamyCore
 api-version: '1.13'
+depend:
+  - PlaceholderAPI
