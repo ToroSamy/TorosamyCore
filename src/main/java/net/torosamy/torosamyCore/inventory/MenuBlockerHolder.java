@@ -4,8 +4,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
-public class InventoryBlockerHolder implements InventoryHolder {
-    public static final InventoryBlockerHolder INVENTORY_BLOCKER_HOLDER = new InventoryBlockerHolder();
+public class MenuBlockerHolder implements InventoryHolder {
+    public static final MenuBlockerHolder INVENTORY_BLOCKER_HOLDER = new MenuBlockerHolder();
     
     @Override
     public @NotNull Inventory getInventory() {
@@ -13,6 +13,6 @@ public class InventoryBlockerHolder implements InventoryHolder {
     }
     
     public static boolean isBlockerInventory(Inventory inventory) {
-        return inventory.getHolder() instanceof InventoryBlockerHolder;
+        return inventory.getHolder() instanceof MenuBlockerHolder;
     }
 }

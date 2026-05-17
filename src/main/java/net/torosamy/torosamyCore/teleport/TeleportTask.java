@@ -1,14 +1,13 @@
 package net.torosamy.torosamyCore.teleport;
 
 import net.torosamy.torosamyCore.TorosamyCore;
+import net.torosamy.torosamyCore.api.TorosamyCoreAPI;
 import net.torosamy.torosamyCore.config.ConfigUtil;
 import net.torosamy.torosamyCore.utils.MessageUtil;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import static net.torosamy.torosamyCore.api.TorosamyCoreAPI.isPlayerStill;
 
 
 public class TeleportTask extends BukkitRunnable {
@@ -46,7 +45,7 @@ public class TeleportTask extends BukkitRunnable {
             return;
         }
         
-        if (!isPlayerStill(player.getLocation(), startLocation)) {
+        if (!TorosamyCoreAPI.isPlayerStill(player.getLocation(), startLocation)) {
             player.sendMessage(MessageUtil.format(ConfigUtil.MAIN_CONFIG.teleportTaskMove));
             this.cancel();
             return;

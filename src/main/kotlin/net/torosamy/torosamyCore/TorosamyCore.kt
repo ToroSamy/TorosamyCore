@@ -7,6 +7,8 @@ import net.torosamy.torosamyCore.holder.NearbyHolder
 import net.torosamy.torosamyCore.holder.RandomNumberHolder
 import net.torosamy.torosamyCore.holder.TimeHolder
 import net.torosamy.torosamyCore.inventory.InventoryBlocker
+import net.torosamy.torosamyCore.request.RequestManager
+import net.torosamy.torosamyCore.request.RequestCancelListener
 import net.torosamy.torosamyCore.utils.MessageUtil
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -27,10 +29,12 @@ class TorosamyCore : JavaPlugin() {
         ConfigUtil.initConfig()
         ConfigUtil.reloadConfig()
         server.pluginManager.registerEvents(InventoryBlocker(), this)
+        server.pluginManager.registerEvents(RequestCancelListener(), this)
         RANDOM_NUMBER_HOLDER.register()
         NEARBY_HOLDER.register()
         TIME_HOLDER.register()
         HAND_ITEM_HOLDER.register()
+        RequestManager.getInstance().runTaskTimer(this, 0L, 20L);
         
         Bukkit.getConsoleSender().sendMessage(MessageUtil.format("&b[服务器娘]&a插件 &eTorosamyCore &a成功开启喵~"))
         Bukkit.getConsoleSender().sendMessage(MessageUtil.format("&b[服务器娘]&a作者 &eTorosamy|yweiyang"))

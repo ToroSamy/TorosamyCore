@@ -10,8 +10,9 @@ public class InventoryBlocker implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getView().getTopInventory();
 
-        if (InventoryBlockerHolder.isBlockerInventory(inventory)) { 
+        if (MenuBlockerHolder.isBlockerInventory(inventory)) { 
             event.setCancelled(true);
         }
     }
+    
 }

@@ -89,7 +89,6 @@ public class ToolData implements DataManager{
         if (material != null && material.isBlock()) {
             TypedKey<BlockType> typedKey = TypedKey.create(RegistryKey.BLOCK, material.getKey());
 
-            // 【核心修正】使用 RegistrySet.keySet 创建只包含一个 Key 的 Set
             return RegistrySet.keySet(RegistryKey.BLOCK, typedKey);
         }
 
